@@ -34,24 +34,32 @@ const keyboard = Markup.inlineKeyboard([
 bot.start((ctx) => ctx.reply('Hello'))
 bot.help((ctx) => ctx.reply('Help message'))
 
-bot.on('message',  (ctx) => {
 
-  let {text} = ctx.message;
-  console.log(`2 ${text}`)
- 
-    ctx.telegram.sendCopy(ctx.chat.id, ctx.message, Extra.markup(keyboard))
 
-    bot.action('edit',  ({ editMessageText }) => {
-      editMessageText(strikeThrough(text), Extra.markdown().markup(keyboard))
-         console.log(editMessageText)
-    } )
+  bot.on('message',  (ctx) => {
+    
+    let messageArray = ctx.message.text;
+    console.log(`${messageArray}`);
+    let arr = messageArray.split('\n');
+    console.log(`${arr}`);
+    for (let text of arr){
+      console.log(`${text}`);
+    ctx.telegram.sendMessage(ctx.chat.id, text, Extra.markup(keyboard))
+}
+} )
+
+
+
+bot.action('edit',  params => {
+  const { editMessageText } = params;
+  const messageText = params.update.callback_query.message.text;
+  editMessageText(strikeThrough(messageText), Extra.markdown().markup(keyboard))
 } )
 
 bot.action('delete', ({ deleteMessage }) => deleteMessage());
 bot.launch()
 
 function strikeThrough(text) {
-  console.log(`1 ${text}`)
   return text
     .split('')
     .map(char => char + '\u0336')
@@ -62,6 +70,16 @@ function strikeThrough(text) {
   let msg = ctx.message.split([]);  */
 
 
+/*   let arr = [];
+  let firstCharIndex = null;
+  for (let i = 0; i < messageArray.length; i++){
+    if (messageArray[i] == ' '){
+      if (firstCharIndex !== null){
+
+      }
+    }
+  }
+ */
 
 /* let arr = [];
 let list = 'Колбаса Хлеб Вода';
