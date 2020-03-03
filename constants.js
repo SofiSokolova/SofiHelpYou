@@ -1,5 +1,9 @@
 module.exports = {
     SCENES: {
-        LIST: "list"
-    }
+        LIST: "list",
+        DIARY: "diary"
+    },
+    BUTTONS: {
+        DELETE_LIST: "Delete list"
+    },
 }

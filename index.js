@@ -3,37 +3,34 @@ const config = require("dotenv").config();
 const { SCENES } = require("./constants");
 const TelegramBot = require("telegraf");
 const { list } = require("./src/controllers/list");
+const { diary } = require("./src/controllers/diary");
 const Stage = require("telegraf/stage");
 const session = require("telegraf/session");
 const mongoose = require("mongoose");
 
 const token = config.parsed.TOKEN;
-mongoose.connect(process.env.DB_URL, {
-})
+mongoose
+  .connect(process.env.DB_URL, {})
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
-mongoose.connection.on("open", () => {
-  console.log("MongoDB connected");
+require("./src/models/user.model");
+require("./src/models/diary.model");
 
+mongoose.connection.on("open", () => {
   const bot = new TelegramBot(token, { polling: true });
   const stage = new Stage([list]);
 
   stage.register(list);
+  stage.register(diary);
 
   bot.use(session());
   bot.use(stage.middleware());
   bot.command("list", ctx => ctx.scene.enter(SCENES.LIST));
+  bot.command("diary", ctx => ctx.scene.enter(SCENES.DIARY))
   bot.launch();
 });
 /*
- *connect(process.env.DB_URL, {
- *useMongoClient: true
- *})
- *.then(() => console.log('MongoDB connected'))
- *.catch((err) => console.log(err))
- *
- *
  *bot.onText(/1/, function (msg, match) {
  *var userId = msg.from.id;
  *var text = match[1];
