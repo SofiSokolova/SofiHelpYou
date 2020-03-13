@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-  _id: mongoose.Schema.Types.ObjectId, // ??
   telegramId: {
     type: Number,
     required: true,
@@ -13,8 +12,8 @@ const UserSchema = new Schema({
     default: []
   }
 });
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useUnifiedTopology', true);
-mongoose.model('users', UserSchema)
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
+mongoose.set("useUnifiedTopology", true);
+module.exports = mongoose.model("users", UserSchema);

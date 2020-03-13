@@ -1,6 +1,7 @@
 const Stage = require("telegraf").Stage;
 const { SCENES } = require("../../../constants");
 const WizardScene = require("telegraf/scenes/wizard");
+const kb = require("../../../keyboards");
 const { strikeAction, deleteAction } = require("./actions");
 const {
   getListMessages,
@@ -31,7 +32,7 @@ list.leave(ctx => {
   ctx.telegram.sendMessage(
     ctx.chat.id,
     `I hope to see you later `,
-    deleteListKeyboard.close()
+    kb.menuKeyboard.open({ resize_keyboard: true })
   );
 });
 
