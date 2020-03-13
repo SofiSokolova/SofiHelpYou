@@ -1,11 +1,9 @@
 const { Extra, Markup } = require("telegraf");
 const { ReplyKeyboard } = require("telegram-keyboard-wrapper");
 const { BUTTONS } = require("../../../constants");
-const mongoose = require("mongoose");
-require("../../models/user.model");
 
+const User = require("../../models/user.model");
 
-const User = mongoose.model("users");
 const deleteListKeyboard = new ReplyKeyboard().addRow("Delete list");
 
 function getListInlineKeyboard() {
@@ -22,60 +20,51 @@ function strikeThrough(text) {
     .join("");
 }
 
+async function addUserList(chatId, msgId) {
+  const user = await User.findOneAndUpdate(
+    { telegramId: chatId },
+    { $addToSet: { list: msgId } },
+    {
+      new: true,
+      upsert: true
+    }
+  );
+  await user.save();
+}
+
 async function cleanListMessages(ctx) {
-  let IUser = await User.findOne({ telegramId: ctx.chat.id });
+  const user = await User.findOne({ telegramId: ctx.chat.id });
   if (ctx.message.text === BUTTONS.DELETE_LIST) {
     await Promise.all(
-      IUser.list.map(async item => {
-        ctx.message.message_id = item;
-        await ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
-        IUser.list = [];
+      user.list.map(async item => {
+        await ctx.telegram.deleteMessage(ctx.chat.id, item);
       })
     );
-    IUser.save();
+    user.list = [];
+    await user.save();
   }
 }
 
-async function deleteUserList(chatId, msgId) {
-  let IUser = await User.findOne({ telegramId: chatId });
-  if (IUser) {
-    if (IUser.list.length !== 0) {
-      let index = IUser.list.indexOf(msgId);
-      if (index > -1) {
-        IUser.list.splice(index, 1);
-        IUser.save();
-      }
-    }
-  }
-}
-
-async function addUserList(chatId, msgId) {
-  let IUser = await User.findOne({ telegramId: chatId });
-  if (IUser) {
-    IUser.list.push(msgId);
-    IUser.save().then(() => console.log("list update"));
-  } else {
-    IUser = new User({
-      telegramId: chatId,
-      list: []
-    });
-    IUser.list.push(msgId);
-    IUser.save().then(() => console.log("dratuti"));
-  }
-  return IUser;
+async function deleteListItem(chatId, msgId) {
+  const user = await User.findOneAndUpdate(
+    { telegramId: chatId },
+    { $pull: { list: msgId } },
+    { new: true }
+  );
+  return user;
 }
 
 async function getListMessages(ctx) {
-  let arr = ctx.message.text.split("\n");
-  if (!(ctx.message.text === BUTTONS.DELETE_LIST)) {
+  let splitMessage = ctx.message.text.split("\n");
+  if (ctx.message.text !== BUTTONS.DELETE_LIST) {
     await Promise.all(
-      arr.map(async msg => {
+      splitMessage.map(async msg => {
         let botMsg = await ctx.telegram.sendMessage(
           ctx.chat.id,
           msg,
           Extra.markup(getListInlineKeyboard)
         );
-        addUserList(ctx.chat.id, botMsg.message_id);
+        await addUserList(ctx.chat.id, botMsg.message_id);
       })
     );
   }
@@ -92,5 +81,5 @@ module.exports = {
   strikeThrough,
   getListInlineKeyboard,
   deleteListKeyboard,
-  deleteUserList
+  deleteListItem
 };

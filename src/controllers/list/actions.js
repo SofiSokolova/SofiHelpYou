@@ -1,28 +1,27 @@
 const {
   strikeThrough,
   getListInlineKeyboard,
-  deleteUserList
+  deleteListItem
 } = require("./helpers");
 const { Extra } = require("telegraf");
 require("../../models/user.model");
 
-
-
 const strikeAction = async ctx => {
-  let { textMsg } = ctx;
-  textMsg = ctx.update.callback_query.message.text;
   await ctx.editMessageText(
-    strikeThrough(textMsg),
+    strikeThrough(ctx.update.callback_query.message.text),
     Extra.markup(getListInlineKeyboard)
   );
 };
 
 const deleteAction = async ctx => {
-  let chatId = ctx.chat.id;
-  let { del } = ctx;
-  del = ctx.update.callback_query.message.message_id;
-  deleteUserList(chatId, del);
-  await ctx.telegram.deleteMessage(ctx.chat.id, del);
+  await deleteListItem(
+    ctx.chat.id,
+    ctx.update.callback_query.message.message_id
+  );
+  await ctx.telegram.deleteMessage(
+    ctx.chat.id,
+    ctx.update.callback_query.message.message_id
+  );
 };
 
 module.exports = {
