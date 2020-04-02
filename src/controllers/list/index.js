@@ -6,7 +6,6 @@ const { strikeAction, deleteAction } = require("./actions");
 const {
   getListMessages,
   cleanListMessages,
-  deleteListKeyboard
 } = require("./helpers");
 
 const { leave } = Stage;

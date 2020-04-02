@@ -9,9 +9,7 @@ const { findByTag } = require("./src/controllers/findByTag");
 const Stage = require("telegraf/stage");
 const session = require("telegraf/session");
 const mongoose = require("mongoose");
-const { Extra } = require("telegraf");
 const kb = require("./keyboards");
-const { chooseFindKeyboard } = require("./src/controllers/findByTag/helpers");
 require("./mongoose.connect");
 
 const token = config.parsed.TOKEN;
@@ -32,34 +30,39 @@ db.on("open", () => {
   bot.use(stage.middleware());
 
   bot.command("start", ctx =>
-    ctx.reply("How can I help you?", kb.menuKeyboard.open({ resize_keyboard: true }))
+    ctx.reply(
+      "How can I help you?",
+      kb.menuKeyboard.open({ resize_keyboard: true })
+    )
   );
 
-  bot.hears(
-    BUTTONS.CREATE_LIST,
-    async ctx => await ctx.scene.enter(SCENES.LIST)
-  );
-  bot.hears(
-    BUTTONS.NEW_RECORD,
-    async ctx => await ctx.scene.enter(SCENES.RECORD)
-  );
-  bot.hears(
-    BUTTONS.FIND,
-    async ctx => await ctx.reply('Select search type', kb.findKeyboard.open({ resize_keyboard: true }))
-  );
-  bot.hears(
-    BUTTONS.FIND_BY_TAG,
-    async ctx => await ctx.scene.enter(SCENES.FIND_BY_TAG)
-  );
+  bot.on("message", async ctx => {
+    console.log(ctx.message.text);
+    switch (ctx.message.text) {
+      case BUTTONS.CREATE_LIST:
+        await ctx.scene.enter(SCENES.LIST);
+        break;
+      case BUTTONS.NEW_RECORD:
+        await ctx.scene.enter(SCENES.RECORD);
+        break;
+      case BUTTONS.FIND:
+        await ctx.reply(
+          "Select search type",
+          kb.findKeyboard.open({ resize_keyboard: true })
+        );
+        break;
+      case BUTTONS.FIND_BY_TAG:
+        await ctx.scene.enter(SCENES.FIND_BY_TAG);
+        break;
+      case BUTTONS.BACK:
+        await ctx.reply(
+          "How can I help you?",
+          kb.menuKeyboard.open({ resize_keyboard: true })
+        );
+        break;
+    }
+  });
 
-  /*   bot.action(/New record/, ctx => ctx.scene.enter(SCENES.RECORD)) */
-  bot.action(/Find/, ctx =>
-    ctx.reply(" Choose a search type", Extra.markup(chooseFindKeyboard))
-  );
-  bot.action(/Find by tag/, ctx => ctx.scene.enter(SCENES.FIND));
-
-  /*   bot.command("list", ctx => ctx.scene.enter(SCENES.LIST)); */
-  /*   bot.command("find", ctx => ctx.scene.enter(SCENES.FIND)); */
   bot.launch();
 });
 /*

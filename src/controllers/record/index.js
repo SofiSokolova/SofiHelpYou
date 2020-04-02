@@ -2,7 +2,6 @@ const Stage = require("telegraf").Stage;
 const { SCENES } = require("../../../constants");
 const WizardScene = require("telegraf/scenes/wizard");
 const kb = require("../../../keyboards");
-const { Extra, Markup } = require("telegraf");
 const {
   recordToDiary,
   deleteMessageKeyboard,
@@ -14,16 +13,16 @@ const record = new WizardScene(
   SCENES.RECORD,
   async ctx => {
     ctx.reply(
-      `Write me what happened to you today. For example:\n "Today I'm SO happy #happy #theBestDayOfMyLife"\nAlso you can send me a photo.\nIn the future, you can find this message by tag`
-    );
-    await ctx.telegram.sendMessage(
-      ctx.chat.id,
-      "Press the button and I'll delete your message from here, but I'll save it in my memory until you need it",
-      deleteMessageKeyboard.open({ resize_keyboard: true })
+      `Write me what happened to you today. For example:\n "Today I'm SO happy #happy #theBestDayOfMyLife"\nIn the future, you can find this message by tag`
     );
     return ctx.wizard.next();
   },
   async ctx => {
+    ctx.telegram.sendMessage(
+      ctx.chat.id,
+      "Press the button and I'll delete your message from here, but I'll save it in my memory until you need it",
+      deleteMessageKeyboard.open({ resize_keyboard: true })
+    );
     recordToDiary(ctx);
     return ctx.wizard.next();
   },

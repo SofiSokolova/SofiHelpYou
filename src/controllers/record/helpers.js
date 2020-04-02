@@ -1,5 +1,4 @@
 require("../../models/diary.model");
-const { Extra, Markup } = require("telegraf");
 const { BUTTONS } = require("../../../constants");
 const Diary = require("../../models/diary.model");
 const { ReplyKeyboard } = require("telegram-keyboard-wrapper");
@@ -11,6 +10,7 @@ const deleteMessageKeyboard = new ReplyKeyboard().addRow(
 async function deleteUserMessage(ctx) {
   if (ctx.message.text === BUTTONS.DELETE_MESSAGE) {
     await ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id - 1);
+    await ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id - 2);
   }
 }
 
