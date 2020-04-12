@@ -1,8 +1,6 @@
 const Stage = require("telegraf").Stage;
 const { SCENES } = require("../../../constants");
-const { BUTTONS } = require("../../../constants");
 const WizardScene = require("telegraf/scenes/wizard");
-const { chooseFindKeyboard } = require("./helpers");
 const { leave } = Stage;
 const kb = require("../../../keyboards");
 const findByTag = new WizardScene(
