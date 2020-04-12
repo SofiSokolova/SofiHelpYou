@@ -6,6 +6,7 @@ const TelegramBot = require("telegraf");
 const { list } = require("./src/controllers/list");
 const { record } = require("./src/controllers/record");
 const { findByTag } = require("./src/controllers/findByTag");
+const { findByDate } = require("./src/controllers/findByDate");
 const Stage = require("telegraf/stage");
 const session = require("telegraf/session");
 const mongoose = require("mongoose");
@@ -25,6 +26,7 @@ db.on("open", () => {
   stage.register(list);
   stage.register(record);
   stage.register(findByTag);
+  stage.register(findByDate);
 
   bot.use(session());
   bot.use(stage.middleware());
@@ -54,6 +56,9 @@ db.on("open", () => {
       case BUTTONS.FIND_BY_TAG:
         await ctx.scene.enter(SCENES.FIND_BY_TAG);
         break;
+        case BUTTONS.FIND_BY_DATE:
+          await ctx.scene.enter(SCENES.FIND_BY_DATE);
+          break;
       case BUTTONS.BACK:
         await ctx.reply(
           "How can I help you?",
